@@ -2,70 +2,68 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Alipay UID 提取工具</title>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f8f8f8;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #007b00;
+    }
+  </style>
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
+  <h1>Alipay UID 提取工具</h1>
+  <label for="token">請貼上 Token 或付款連結：</label>
+  <textarea id="token" placeholder="貼上付款連結或 Token..."></textarea>
+  <button onclick="extractUID()">提取 UID</button>
+  <div class="result" id="result"></div>
 
-    const { useState } = React;
+  <script>
+    function extractUID() {
+      const input = document.getElementById("token").value;
+      const regex = /[uU]id(?:=|%3D)?([0-9]{6,})/;
+      const match = input.match(regex);
 
-    function AlipayUIDExtractor() {
-      const [inputUrl, setInputUrl] = useState("");
-      const [uid, setUid] = useState("");
-      const [copied, setCopied] = useState(false);
-
-      const extractUID = () => {
-        try {
-          const decoded = decodeURIComponent(inputUrl);
-          const match = decoded.match(/uid[=\\/%3D]?([0-9a-zA-Z]+)/);
-          if (match && match[1]) {
-            setUid(match[1]);
-          } else {
-            setUid("❌ 未找到 UID，請確認鏈結格式。");
-          }
-        } catch (err) {
-          setUid("❌ 解析錯誤：請輸入有效的URL。");
-        }
-      };
-
-      const handleCopy = () => {
-        if (uid && !uid.startsWith("❌")) {
-          navigator.clipboard.writeText(uid);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        }
-      };
-
-      return (
-        <div style={{ padding: 24, maxWidth: 600, margin: "auto", fontFamily: "sans-serif" }}>
-          <h2>🔍 Alipay UID 提取工具</h2>
-          <input
-            style={{ width: "100%", padding: 8 }}
-            placeholder="貼上 Alipay 跳轉連結或二維碼網址"
-            value={inputUrl}
-            onChange={(e) => setInputUrl(e.target.value)}
-          />
-          <button style={{ marginTop: 8 }} onClick={extractUID}>解析 UID</button>
-          {uid && (
-            <div style={{ marginTop: 16 }}>
-              <strong>結果：</strong> {uid}
-              {!uid.startsWith("❌") && (
-                <button onClick={handleCopy} style={{ marginLeft: 8 }}>複製</button>
-              )}
-              {copied && <span style={{ color: "green", marginLeft: 8 }}>✔ 已複製</span>}
-            </div>
-          )}
-        </div>
-      );
+      const resultDiv = document.getElementById("result");
+      if (match && match[1]) {
+        resultDiv.innerText = "✅ UID 為：" + match[1];
+      } else {
+        resultDiv.innerText = "⚠️ 無法解析 UID，請確認格式是否正確";
+      }
     }
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<AlipayUIDExtractor />);
-
   </script>
 </body>
 </html>
+
