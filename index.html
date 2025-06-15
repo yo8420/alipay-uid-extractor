@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Alipay UID 擷取工具</title>
   <style>
     body {
@@ -27,27 +27,29 @@
     #result {
       margin-top: 15px;
       font-weight: bold;
+      word-break: break-all;
     }
   </style>
 </head>
 <body>
   <h1>Alipay UID 擷取工具</h1>
-  <input type="text" id="urlInput" placeholder="請貼上 Alipay 二維碼 URL">
-  <button onclick="extractUID()">📋 擷取 UID</button>
-  <div id="result"></div>
+  <input type="text" id="urlInput" placeholder="請貼上 Alipay 二維碼 URL" />
+  <button onclick="extractUID()">📋 解析 UID</button>
+  <div id="result">結果會顯示在這裡</div>
 
   <script>
     function extractUID() {
-      const url = decodeURIComponent(document.getElementById('urlInput').value.trim());
-      const match = url.match(/uid[=|%3D]?([0-9a-zA-Z]+)/);
-      const resultDiv = document.getElementById('result');
+      const input = document.getElementById("urlInput").value.trim();
+      const decoded = decodeURIComponent(input);
+      const match = decoded.match(/uid(?:%3D|=)?([0-9a-zA-Z]+)/);
       if (match && match[1]) {
         const uid = match[1];
+        document.getElementById("result").innerText = "UID: " + uid;
         navigator.clipboard.writeText(uid).then(() => {
-          resultDiv.innerText = `✅ 擷取成功：${uid}（已複製）`;
+          document.getElementById("result").innerText += "（已自動複製）";
         });
       } else {
-        resultDiv.innerText = "⚠️ 無法解析 UID，請確認格式正確。";
+        document.getElementById("result").innerText = "❌ 沒有擷取到 UID，請檢查格式";
       }
     }
   </script>
