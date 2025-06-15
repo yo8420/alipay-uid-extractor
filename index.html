@@ -1,59 +1,55 @@
-import { useState } from 'react';
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Copy } from "lucide-react";
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>Alipay UID 擷取工具</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f8f8f8;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    textarea, input {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Alipay UID 擷取工具</h1>
+  <input type="text" id="urlInput" placeholder="請貼上 Alipay 二維碼 URL">
+  <button onclick="extractUID()">📋 擷取 UID</button>
+  <div id="result"></div>
 
-export default function AlipayUIDExtractor() {
-  const [inputUrl, setInputUrl] = useState("");
-  const [uid, setUid] = useState("");
-  const [copied, setCopied] = useState(false);
-
-  const extractUID = () => {
-    try {
-      const decoded = decodeURIComponent(inputUrl);
-      const match = decoded.match(/uid[=\/%3D]?([0-9a-zA-Z]+)/);
+  <script>
+    function extractUID() {
+      const url = decodeURIComponent(document.getElementById('urlInput').value.trim());
+      const match = url.match(/uid[=|%3D]?([0-9a-zA-Z]+)/);
+      const resultDiv = document.getElementById('result');
       if (match && match[1]) {
-        setUid(match[1]);
+        const uid = match[1];
+        navigator.clipboard.writeText(uid).then(() => {
+          resultDiv.innerText = `✅ 擷取成功：${uid}（已複製）`;
+        });
       } else {
-        setUid("未找到 UID，請確認鏈結格式。");
+        resultDiv.innerText = "⚠️ 無法解析 UID，請確認格式正確。";
       }
-    } catch (err) {
-      setUid("解析錯誤：請輸入有效的URL。");
     }
-  };
-
-  const handleCopy = () => {
-    if (uid && !uid.startsWith("未")) {
-      navigator.clipboard.writeText(uid);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
-  return (
-    <div className="max-w-xl mx-auto p-4 space-y-4">
-      <Card>
-        <CardContent className="space-y-4 pt-4">
-          <Input
-            placeholder="輸入 Alipay 跳轉鏈結或二維碼網址"
-            value={inputUrl}
-            onChange={(e) => setInputUrl(e.target.value)}
-          />
-          <Button onClick={extractUID}>解析 UID</Button>
-          {uid && (
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium break-all">{uid}</span>
-              {!uid.startsWith("未") && (
-                <Button onClick={handleCopy} variant="outline" size="icon">
-                  <Copy size={16} />
-                </Button>
-              )}
-              {copied && <span className="text-green-500 text-xs">已複製</span>}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+  </script>
+</body>
+</html>
